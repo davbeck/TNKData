@@ -1,0 +1,478 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1129F45D1906EF050083A3E6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1129F45C1906EF050083A3E6 /* Foundation.framework */; };
+		1129F45F1906EF050083A3E6 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1129F45E1906EF050083A3E6 /* CoreGraphics.framework */; };
+		1129F4611906EF050083A3E6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1129F4601906EF050083A3E6 /* UIKit.framework */; };
+		1129F4671906EF050083A3E6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1129F4651906EF050083A3E6 /* InfoPlist.strings */; };
+		1129F4691906EF050083A3E6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1129F4681906EF050083A3E6 /* main.m */; };
+		1129F46D1906EF050083A3E6 /* TNKAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1129F46C1906EF050083A3E6 /* TNKAppDelegate.m */; };
+		1129F4701906EF050083A3E6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1129F46E1906EF050083A3E6 /* Main.storyboard */; };
+		1129F4731906EF050083A3E6 /* TNKMasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1129F4721906EF050083A3E6 /* TNKMasterViewController.m */; };
+		1129F4761906EF050083A3E6 /* TNKDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1129F4751906EF050083A3E6 /* TNKDetailViewController.m */; };
+		1129F4781906EF050083A3E6 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1129F4771906EF050083A3E6 /* Images.xcassets */; };
+		1129F47F1906EF050083A3E6 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1129F47E1906EF050083A3E6 /* XCTest.framework */; };
+		1129F4801906EF050083A3E6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1129F45C1906EF050083A3E6 /* Foundation.framework */; };
+		1129F4811906EF050083A3E6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1129F4601906EF050083A3E6 /* UIKit.framework */; };
+		1129F4891906EF050083A3E6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1129F4871906EF050083A3E6 /* InfoPlist.strings */; };
+		1129F48B1906EF050083A3E6 /* TNKDataDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1129F48A1906EF050083A3E6 /* TNKDataDemoTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1129F4821906EF050083A3E6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1129F4511906EF050083A3E6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1129F4581906EF050083A3E6;
+			remoteInfo = TNKDataDemo;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		1129F4591906EF050083A3E6 /* TNKDataDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TNKDataDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1129F45C1906EF050083A3E6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		1129F45E1906EF050083A3E6 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		1129F4601906EF050083A3E6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		1129F4641906EF050083A3E6 /* TNKDataDemo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TNKDataDemo-Info.plist"; sourceTree = "<group>"; };
+		1129F4661906EF050083A3E6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1129F4681906EF050083A3E6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		1129F46A1906EF050083A3E6 /* TNKDataDemo-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TNKDataDemo-Prefix.pch"; sourceTree = "<group>"; };
+		1129F46B1906EF050083A3E6 /* TNKAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TNKAppDelegate.h; sourceTree = "<group>"; };
+		1129F46C1906EF050083A3E6 /* TNKAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TNKAppDelegate.m; sourceTree = "<group>"; };
+		1129F46F1906EF050083A3E6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		1129F4711906EF050083A3E6 /* TNKMasterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TNKMasterViewController.h; sourceTree = "<group>"; };
+		1129F4721906EF050083A3E6 /* TNKMasterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TNKMasterViewController.m; sourceTree = "<group>"; };
+		1129F4741906EF050083A3E6 /* TNKDetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TNKDetailViewController.h; sourceTree = "<group>"; };
+		1129F4751906EF050083A3E6 /* TNKDetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TNKDetailViewController.m; sourceTree = "<group>"; };
+		1129F4771906EF050083A3E6 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		1129F47D1906EF050083A3E6 /* TNKDataDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TNKDataDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1129F47E1906EF050083A3E6 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		1129F4861906EF050083A3E6 /* TNKDataDemoTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TNKDataDemoTests-Info.plist"; sourceTree = "<group>"; };
+		1129F4881906EF050083A3E6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1129F48A1906EF050083A3E6 /* TNKDataDemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TNKDataDemoTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1129F4561906EF050083A3E6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1129F45F1906EF050083A3E6 /* CoreGraphics.framework in Frameworks */,
+				1129F4611906EF050083A3E6 /* UIKit.framework in Frameworks */,
+				1129F45D1906EF050083A3E6 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1129F47A1906EF050083A3E6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1129F47F1906EF050083A3E6 /* XCTest.framework in Frameworks */,
+				1129F4811906EF050083A3E6 /* UIKit.framework in Frameworks */,
+				1129F4801906EF050083A3E6 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1129F4501906EF050083A3E6 = {
+			isa = PBXGroup;
+			children = (
+				1129F4621906EF050083A3E6 /* TNKDataDemo */,
+				1129F4841906EF050083A3E6 /* TNKDataDemoTests */,
+				1129F45B1906EF050083A3E6 /* Frameworks */,
+				1129F45A1906EF050083A3E6 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1129F45A1906EF050083A3E6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1129F4591906EF050083A3E6 /* TNKDataDemo.app */,
+				1129F47D1906EF050083A3E6 /* TNKDataDemoTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1129F45B1906EF050083A3E6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1129F45C1906EF050083A3E6 /* Foundation.framework */,
+				1129F45E1906EF050083A3E6 /* CoreGraphics.framework */,
+				1129F4601906EF050083A3E6 /* UIKit.framework */,
+				1129F47E1906EF050083A3E6 /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		1129F4621906EF050083A3E6 /* TNKDataDemo */ = {
+			isa = PBXGroup;
+			children = (
+				1129F46B1906EF050083A3E6 /* TNKAppDelegate.h */,
+				1129F46C1906EF050083A3E6 /* TNKAppDelegate.m */,
+				1129F46E1906EF050083A3E6 /* Main.storyboard */,
+				1129F4711906EF050083A3E6 /* TNKMasterViewController.h */,
+				1129F4721906EF050083A3E6 /* TNKMasterViewController.m */,
+				1129F4741906EF050083A3E6 /* TNKDetailViewController.h */,
+				1129F4751906EF050083A3E6 /* TNKDetailViewController.m */,
+				1129F4771906EF050083A3E6 /* Images.xcassets */,
+				1129F4631906EF050083A3E6 /* Supporting Files */,
+			);
+			path = TNKDataDemo;
+			sourceTree = "<group>";
+		};
+		1129F4631906EF050083A3E6 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				1129F4641906EF050083A3E6 /* TNKDataDemo-Info.plist */,
+				1129F4651906EF050083A3E6 /* InfoPlist.strings */,
+				1129F4681906EF050083A3E6 /* main.m */,
+				1129F46A1906EF050083A3E6 /* TNKDataDemo-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		1129F4841906EF050083A3E6 /* TNKDataDemoTests */ = {
+			isa = PBXGroup;
+			children = (
+				1129F48A1906EF050083A3E6 /* TNKDataDemoTests.m */,
+				1129F4851906EF050083A3E6 /* Supporting Files */,
+			);
+			path = TNKDataDemoTests;
+			sourceTree = "<group>";
+		};
+		1129F4851906EF050083A3E6 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				1129F4861906EF050083A3E6 /* TNKDataDemoTests-Info.plist */,
+				1129F4871906EF050083A3E6 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1129F4581906EF050083A3E6 /* TNKDataDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1129F48E1906EF050083A3E6 /* Build configuration list for PBXNativeTarget "TNKDataDemo" */;
+			buildPhases = (
+				1129F4551906EF050083A3E6 /* Sources */,
+				1129F4561906EF050083A3E6 /* Frameworks */,
+				1129F4571906EF050083A3E6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TNKDataDemo;
+			productName = TNKDataDemo;
+			productReference = 1129F4591906EF050083A3E6 /* TNKDataDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
+		1129F47C1906EF050083A3E6 /* TNKDataDemoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1129F4911906EF050083A3E6 /* Build configuration list for PBXNativeTarget "TNKDataDemoTests" */;
+			buildPhases = (
+				1129F4791906EF050083A3E6 /* Sources */,
+				1129F47A1906EF050083A3E6 /* Frameworks */,
+				1129F47B1906EF050083A3E6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1129F4831906EF050083A3E6 /* PBXTargetDependency */,
+			);
+			name = TNKDataDemoTests;
+			productName = TNKDataDemoTests;
+			productReference = 1129F47D1906EF050083A3E6 /* TNKDataDemoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1129F4511906EF050083A3E6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = TNK;
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = ThinkUltimate;
+				TargetAttributes = {
+					1129F47C1906EF050083A3E6 = {
+						TestTargetID = 1129F4581906EF050083A3E6;
+					};
+				};
+			};
+			buildConfigurationList = 1129F4541906EF050083A3E6 /* Build configuration list for PBXProject "TNKDataDemo" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 1129F4501906EF050083A3E6;
+			productRefGroup = 1129F45A1906EF050083A3E6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1129F4581906EF050083A3E6 /* TNKDataDemo */,
+				1129F47C1906EF050083A3E6 /* TNKDataDemoTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1129F4571906EF050083A3E6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1129F4781906EF050083A3E6 /* Images.xcassets in Resources */,
+				1129F4671906EF050083A3E6 /* InfoPlist.strings in Resources */,
+				1129F4701906EF050083A3E6 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1129F47B1906EF050083A3E6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1129F4891906EF050083A3E6 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1129F4551906EF050083A3E6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1129F4731906EF050083A3E6 /* TNKMasterViewController.m in Sources */,
+				1129F46D1906EF050083A3E6 /* TNKAppDelegate.m in Sources */,
+				1129F4691906EF050083A3E6 /* main.m in Sources */,
+				1129F4761906EF050083A3E6 /* TNKDetailViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1129F4791906EF050083A3E6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1129F48B1906EF050083A3E6 /* TNKDataDemoTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1129F4831906EF050083A3E6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1129F4581906EF050083A3E6 /* TNKDataDemo */;
+			targetProxy = 1129F4821906EF050083A3E6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		1129F4651906EF050083A3E6 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1129F4661906EF050083A3E6 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		1129F46E1906EF050083A3E6 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1129F46F1906EF050083A3E6 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		1129F4871906EF050083A3E6 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1129F4881906EF050083A3E6 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		1129F48C1906EF050083A3E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		1129F48D1906EF050083A3E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		1129F48F1906EF050083A3E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TNKDataDemo/TNKDataDemo-Prefix.pch";
+				INFOPLIST_FILE = "TNKDataDemo/TNKDataDemo-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		1129F4901906EF050083A3E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TNKDataDemo/TNKDataDemo-Prefix.pch";
+				INFOPLIST_FILE = "TNKDataDemo/TNKDataDemo-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		1129F4921906EF050083A3E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/TNKDataDemo.app/TNKDataDemo";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TNKDataDemo/TNKDataDemo-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "TNKDataDemoTests/TNKDataDemoTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		1129F4931906EF050083A3E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/TNKDataDemo.app/TNKDataDemo";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TNKDataDemo/TNKDataDemo-Prefix.pch";
+				INFOPLIST_FILE = "TNKDataDemoTests/TNKDataDemoTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1129F4541906EF050083A3E6 /* Build configuration list for PBXProject "TNKDataDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1129F48C1906EF050083A3E6 /* Debug */,
+				1129F48D1906EF050083A3E6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1129F48E1906EF050083A3E6 /* Build configuration list for PBXNativeTarget "TNKDataDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1129F48F1906EF050083A3E6 /* Debug */,
+				1129F4901906EF050083A3E6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		1129F4911906EF050083A3E6 /* Build configuration list for PBXNativeTarget "TNKDataDemoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1129F4921906EF050083A3E6 /* Debug */,
+				1129F4931906EF050083A3E6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1129F4511906EF050083A3E6 /* Project object */;
+}

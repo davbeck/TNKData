@@ -8,11 +8,23 @@
 
 #import "TNKAppDelegate.h"
 
+#import <TNKData/TNKData.h>
+
+#import "TNKEvent.h"
+
 @implementation TNKAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Override point for customization after application launch.
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+	NSString *cacheDirectory = paths.firstObject;
+	NSString *path = [cacheDirectory stringByAppendingPathComponent:@"TCCache.sqlite3"];
+    NSLog(@"sqlite path: %@", [path stringByReplacingOccurrencesOfString:@" " withString:@"\\ "]);
+    NSURL *URL = [NSURL fileURLWithPath:path];
+    
+    TNKConnection *connection = [TNKConnection connectionWithURL:URL classes:[NSSet setWithObject:[TNKEvent class]]];
+    [TNKConnection setDefaultConnection:connection];
+    
     return YES;
 }
 							

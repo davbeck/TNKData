@@ -1,0 +1,21 @@
+PODS:
+  - FMDB (2.2):
+    - FMDB/standard
+  - FMDB/common (2.2)
+  - FMDB/standard (2.2):
+    - FMDB/common
+  - TNKData (0.1.0):
+    - FMDB (~> 2.2)
+
+DEPENDENCIES:
+  - TNKData (from `../`)
+
+EXTERNAL SOURCES:
+  TNKData:
+    :path: ../
+
+SPEC CHECKSUMS:
+  FMDB: e0dd09464b4e1a1cd7fa51ea835ae821b5656865
+  TNKData: d5a2ea50ad45d1d8262c7726d93cfa7af51fa2a5
+
+COCOAPODS: 0.32.1

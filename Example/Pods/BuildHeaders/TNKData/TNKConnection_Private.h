@@ -1,0 +1,1 @@
+../../../../Classes/TNKConnection_Private.h

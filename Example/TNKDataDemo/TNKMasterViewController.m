@@ -11,6 +11,7 @@
 #import <TNKData/TNKData.h>
 
 #import "TNKDetailViewController.h"
+#import "TNKEvent.h"
 
 @interface TNKMasterViewController () {
     NSMutableArray *_objects;
@@ -31,6 +32,11 @@
 
 - (void)insertNewObject:(id)sender
 {
+    [TNKEvent insertObjectWithInitialization:^(TNKEvent *object) {
+        object.date = [NSDate date];
+    }];
+    
+    
     if (!_objects) {
         _objects = [[NSMutableArray alloc] init];
     }

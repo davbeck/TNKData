@@ -32,9 +32,16 @@
 
 - (void)insertNewObject:(id)sender
 {
-    [TNKEvent insertObjectWithInitialization:^(TNKEvent *object) {
+    TNKEvent *event = [TNKEvent insertObjectWithInitialization:^(TNKEvent *object) {
         object.date = [NSDate date];
     }];
+    
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void){
+        NSLog(@"updating event: %@", event);
+        
+        event.date = [NSDate distantFuture];
+    });
     
     
     if (!_objects) {

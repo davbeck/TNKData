@@ -14,7 +14,7 @@
 
 + (NSSet *)persistentKeys
 {
-    return [NSSet setWithArray:@[@"id", @"date"]];
+    return [NSSet setWithArray:@[@"objectID", @"date"]];
 }
 
 @end

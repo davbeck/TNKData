@@ -11,6 +11,8 @@
 @interface TNKConnection : NSObject
 
 @property (strong, readonly) NSSet *insertedObjects;
+@property (strong, readonly) NSSet *updatedObjects;
+@property (strong, readonly) NSSet *deletedObjects;
 
 + (void)setDefaultConnection:(TNKConnection *)connection;
 + (instancetype)defaultConnection;
@@ -21,6 +23,8 @@
 - (instancetype)initWithURL:(NSURL *)URL classes:(NSSet *)classes;
 
 - (void)setNeedsSave;
+- (void)triggerSave;
 - (void)save;
+@property (nonatomic) NSTimeInterval saveInterval;
 
 @end

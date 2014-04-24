@@ -19,17 +19,18 @@
     NSMutableDictionary *_faultedValues;
     NSMutableDictionary *_changedValues;
     dispatch_queue_t _propertyQueue;
+    
+    BOOL _initializing;
 }
 
 @property (nonatomic, weak, readwrite) TNKConnection *connection;
-@property (nonatomic, readwrite) BOOL isInserted;
 
 @end
 
 
 @implementation TNKObject
 
-@dynamic id;
+@dynamic objectID;
 
 
 #pragma mark - Properties
@@ -52,6 +53,21 @@
     });
     
     return changedValues;
+}
+
+- (BOOL)isInserted
+{
+    return _initializing || [self.connection.insertedObjects containsObject:self];
+}
+
+- (BOOL)isUpdated
+{
+    return [self.connection.updatedObjects containsObject:self];
+}
+
+- (BOOL)isDeleted
+{
+    return [self.connection.deletedObjects containsObject:self];
 }
 
 
@@ -393,12 +409,12 @@
 
 + (NSSet *)persistentKeys
 {
-    return [NSSet setWithObject:@"id"];
+    return [NSSet setWithObject:@"objectID"];
 }
 
 + (NSSet *)primaryKeys
 {
-    return [NSSet setWithObject:@"id"];
+    return [NSSet setWithObject:@"objectID"];
 }
 
 - (id)primitiveValueForKey:(NSString *)key
@@ -417,11 +433,33 @@
     dispatch_async(_propertyQueue, ^{
         _faultedValues[key] = value;
         _changedValues[key] = value;
+        if (!self.isInserted && !self.isUpdated && !self.isDeleted) {
+            [self.connection updateObject:self];
+        }
     });
+}
+
+- (id)valueForUndefinedKey:(NSString *)key
+{
+    return [self primitiveValueForKey:key] ?: [super valueForUndefinedKey:key];
+}
+
+- (void)setValue:(id)value forUndefinedKey:(NSString *)key
+{
+    if ([[self.class persistentKeys] containsObject:key]) {
+        [self setPrimativeValue:value forKey:key];
+    } else {
+        [super setValue:value forUndefinedKey:key];
+    }
 }
 
 
 #pragma mark - SQLite
+
++ (NSString *)sqliteTableName
+{
+    return NSStringFromClass([self class]);
+}
 
 + (NSString *)sqliteTypeForPersistentKey:(NSString *)persistentKey
 {
@@ -490,8 +528,19 @@
         [columnDefinitions addObject:[NSString stringWithFormat:@"%@ %@ %@", key, type, columnConstraints]];
     }
     
-    NSString *sql = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (%@)", NSStringFromClass([self class]), [columnDefinitions componentsJoinedByString:@", "]];
+    NSString *sql = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (%@)", [self sqliteTableName], [columnDefinitions componentsJoinedByString:@", "]];
     [db executeUpdate:sql];
+}
+
+- (NSString *)sqliteWhereClause
+{
+    NSSet *primaryKeys = [self.class primaryKeys];
+    NSMutableArray *keyClauses = [[NSMutableArray alloc] initWithCapacity:primaryKeys.count];
+    for (NSString *key in primaryKeys) {
+        [keyClauses addObject:[NSString stringWithFormat:@"%1$@ = :%1$@", key]];
+    }
+    
+    return [keyClauses componentsJoinedByString:@" AND "];
 }
 
 - (void)insertIntoDatabase:(FMDatabase *)db
@@ -503,8 +552,31 @@
         [keyPlaceholder addObject:[@":" stringByAppendingString:key]];
     }
     
-    NSString *query = [NSString stringWithFormat:@"INSERT INTO %@ (%@) VALUES (%@)", NSStringFromClass([self class]), [keys componentsJoinedByString:@", "], [keyPlaceholder componentsJoinedByString:@", "]];
-    NSLog(@"query: %@", query);
+    NSString *query = [NSString stringWithFormat:@"INSERT INTO %@ (%@) VALUES (%@)", [self.class sqliteTableName], [keys componentsJoinedByString:@", "], [keyPlaceholder componentsJoinedByString:@", "]];
+    NSLog(@"insert query: %@", query);
+    
+    [db executeUpdate:query withParameterDictionary:values];
+    
+    dispatch_sync(_propertyQueue, ^{
+        _faultedValues[@"objectID"] = @([db lastInsertRowId]);
+    });
+}
+
+- (void)updateInDatabase:(FMDatabase *)db
+{
+    NSMutableDictionary *values = [self.changedValues mutableCopy];
+    NSArray *keys = [values allKeys];
+    NSMutableArray *keyClauses = [[NSMutableArray alloc] initWithCapacity:keys.count];
+    for (NSString *key in keys) {
+        [keyClauses addObject:[NSString stringWithFormat:@"%1$@ = :%1$@", key]];
+    }
+    
+    for (NSString *key in [self.class primaryKeys]) {
+        values[key] = [self valueForKey:key];
+    }
+    
+    NSString *query = [NSString stringWithFormat:@"UPDATE %@ SET %@ WHERE %@", [self.class sqliteTableName], [keyClauses componentsJoinedByString:@", "], [self sqliteWhereClause]];
+    NSLog(@"update query: %@", query);
     
     [db executeUpdate:query withParameterDictionary:values];
 }
@@ -529,17 +601,21 @@
 {
     TNKObject *object = [[self alloc] init];
     object.connection = [TNKConnection currentConnection];
-    object.isInserted = YES;
+    object->_initializing = YES;
     
     if (initialization != nil) {
         initialization(object);
     }
     
-    dispatch_sync(object->_propertyQueue, ^{
-        [object.connection insertObject:object];
-    });
+    [object.connection insertObject:object];
+    object->_initializing = NO;
     
     return object;
+}
+
+- (void)deleteObject
+{
+    [self.connection deleteObject:self];
 }
 
 @end

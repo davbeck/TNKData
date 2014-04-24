@@ -14,5 +14,7 @@
 @interface TNKConnection ()
 
 - (void)insertObject:(TNKObject *)object;
+- (void)updateObject:(TNKObject *)object;
+- (void)deleteObject:(TNKObject *)object;
 
 @end

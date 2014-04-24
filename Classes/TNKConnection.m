@@ -20,10 +20,15 @@
     NSSet *_classes;
     
     NSMutableSet *_insertedObjects;
+    NSMutableSet *_updatedObjects;
+    NSMutableSet *_deletedObjects;
     
     BOOL _needsSave;
     
     dispatch_queue_t _propertyQueue;
+#ifdef TARGET_OS_IPHONE
+    UIBackgroundTaskIdentifier _saveTask;
+#endif
 }
 
 @end
@@ -39,6 +44,26 @@
     });
     
     return insertedObjects;
+}
+
+- (NSSet *)updatedObjects
+{
+    __block NSSet *updatedObjects = nil;
+    dispatch_sync(_propertyQueue, ^{
+        updatedObjects = [_updatedObjects copy];
+    });
+    
+    return updatedObjects;
+}
+
+- (NSSet *)deletedObjects
+{
+    __block NSSet *deletedObjects = nil;
+    dispatch_sync(_propertyQueue, ^{
+        deletedObjects = [_deletedObjects copy];
+    });
+    
+    return deletedObjects;
 }
 
 static TNKConnection *_defaultConnection = nil;
@@ -91,8 +116,11 @@ static TNKConnection *_defaultConnection = nil;
     self = [super init];
     if (self) {
         _insertedObjects = [NSMutableSet new];
+        _updatedObjects = [NSMutableSet new];
+        _deletedObjects = [NSMutableSet new];
         
         _propertyQueue = dispatch_queue_create("TNKConnection-property-accessor", NULL);
+        _saveInterval = 1.0;
         
         _databaseQueue = [FMDatabaseQueue databaseQueueWithPath:URL.path];
         _classes = [classes copyWithZone:nil];
@@ -102,6 +130,12 @@ static TNKConnection *_defaultConnection = nil;
                 [class createTableInDatabase:db];
             }
         }];
+        
+        
+#ifdef TARGET_OS_IPHONE
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
+#else
+#endif
     }
     
     return self;
@@ -118,6 +152,22 @@ static TNKConnection *_defaultConnection = nil;
     });
 }
 
+- (void)updateObject:(TNKObject *)object
+{
+    dispatch_async(_propertyQueue, ^{
+        [_updatedObjects addObject:object];
+        [self setNeedsSave];
+    });
+}
+
+- (void)deleteObject:(TNKObject *)object
+{
+    dispatch_async(_propertyQueue, ^{
+        [_deletedObjects addObject:object];
+        [self setNeedsSave];
+    });
+}
+
 
 #pragma mark - Saving
 
@@ -127,19 +177,46 @@ static TNKConnection *_defaultConnection = nil;
         if (!_needsSave) {
             _needsSave = YES;
             
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, self.saveInterval * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void){
+                [self triggerSave];
+            });
+        }
+    });
+}
+
+- (void)triggerSave
+{
+    dispatch_async(_propertyQueue, ^{
+        if (_needsSave) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 [self save];
+                
+                if (_saveTask != UIBackgroundTaskInvalid) {
+                    [[UIApplication sharedApplication] endBackgroundTask:_saveTask];
+                }
             });
+        } else {
+            if (_saveTask != UIBackgroundTaskInvalid) {
+                [[UIApplication sharedApplication] endBackgroundTask:_saveTask];
+            }
         }
     });
 }
 
 - (void)save
 {
+    NSLog(@"saving");
+    
     __block NSSet *insertedObjects = nil;
+    __block NSSet *updatedObjects = nil;
     dispatch_async(_propertyQueue, ^{
         _needsSave = NO;
+        
         insertedObjects = [_insertedObjects copy];
+        _insertedObjects = [NSMutableSet new];
+        
+        updatedObjects = [_updatedObjects copy];
+        _updatedObjects = [NSMutableSet new];
     });
     
     [_databaseQueue inTransaction:^(FMDatabase *db, BOOL *rollback) {
@@ -147,10 +224,21 @@ static TNKConnection *_defaultConnection = nil;
             [object insertIntoDatabase:db];
         }
         
-        dispatch_async(_propertyQueue, ^{
-            [_insertedObjects minusSet:insertedObjects];
-        });
+        for (TNKObject *object in updatedObjects) {
+            [object updateInDatabase:db];
+        }
     }];
 }
+
+
+#pragma mark - Notifications
+
+#ifdef TARGET_OS_IPHONE
+- (void)applicationWillResignActive:(NSNotification *)notification
+{
+    _saveTask = [[UIApplication sharedApplication] beginBackgroundTaskWithName:@"TNKConnection-save" expirationHandler:nil];
+    [self triggerSave];
+}
+#endif
 
 @end

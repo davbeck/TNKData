@@ -23,6 +23,7 @@
 - (NSString *)sqliteWhereClause;
 - (void)insertIntoDatabase:(FMDatabase *)db;
 - (void)updateInDatabase:(FMDatabase *)db;
+- (void)deleteFromDatabase:(FMDatabase *)db;
 
 + (instancetype)insertObjectWithInitialization:(void(^)(id object))initialization;
 - (void)deleteObject;

@@ -581,6 +581,19 @@
     [db executeUpdate:query withParameterDictionary:values];
 }
 
+- (void)deleteFromDatabase:(FMDatabase *)db
+{
+    NSMutableDictionary *values = [[NSMutableDictionary alloc] initWithCapacity:[self.class primaryKeys].count];
+    for (NSString *key in [self.class primaryKeys]) {
+        values[key] = [self valueForKey:key];
+    }
+    
+    NSString *query = [NSString stringWithFormat:@"DELETE FROM %@ WHERE %@", [self.class sqliteTableName], [self sqliteWhereClause]];
+    NSLog(@"delete query: %@", query);
+    
+    [db executeUpdate:query withParameterDictionary:values];
+}
+
 
 #pragma mark - Insertion
 

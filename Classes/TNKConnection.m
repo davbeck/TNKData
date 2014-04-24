@@ -209,6 +209,7 @@ static TNKConnection *_defaultConnection = nil;
     
     __block NSSet *insertedObjects = nil;
     __block NSSet *updatedObjects = nil;
+    __block NSSet *deletedObjects = nil;
     dispatch_async(_propertyQueue, ^{
         _needsSave = NO;
         
@@ -217,6 +218,9 @@ static TNKConnection *_defaultConnection = nil;
         
         updatedObjects = [_updatedObjects copy];
         _updatedObjects = [NSMutableSet new];
+        
+        deletedObjects = [_deletedObjects copy];
+        _deletedObjects = [NSMutableSet new];
     });
     
     [_databaseQueue inTransaction:^(FMDatabase *db, BOOL *rollback) {
@@ -226,6 +230,10 @@ static TNKConnection *_defaultConnection = nil;
         
         for (TNKObject *object in updatedObjects) {
             [object updateInDatabase:db];
+        }
+        
+        for (TNKObject *object in deletedObjects) {
+            [object deleteFromDatabase:db];
         }
     }];
 }

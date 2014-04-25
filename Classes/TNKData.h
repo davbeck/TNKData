@@ -12,3 +12,6 @@
 
 #import "TNKConnection.h"
 #import "TNKObject.h"
+#import "TNKObjectQuery.h"
+
+#import "NSPredicate+TNKWhereClause.h"

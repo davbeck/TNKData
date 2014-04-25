@@ -47,6 +47,9 @@
         });
     });
     
+    TNKEvent *oldEvent = [TNKEvent findByServerID:1];
+    NSLog(@"oldEvent: %@", oldEvent);
+    
     
     if (!_objects) {
         _objects = [[NSMutableArray alloc] init];

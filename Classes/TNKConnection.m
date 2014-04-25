@@ -9,6 +9,7 @@
 #import "TNKConnection.h"
 
 #import "TNKData.h"
+#import "TNKConnection_Private.h"
 
 
 #define TNKCurrentConnectionThreadKey @"TNKCurrentConnection"
@@ -16,9 +17,9 @@
 
 @interface TNKConnection ()
 {
-    FMDatabaseQueue *_databaseQueue;
     NSSet *_classes;
     
+    NSMapTable *_registeredObjects;
     NSMutableSet *_insertedObjects;
     NSMutableSet *_updatedObjects;
     NSMutableSet *_deletedObjects;
@@ -65,6 +66,14 @@
     
     return deletedObjects;
 }
+
+- (id)existingObjectWithClass:(Class)objectClass primaryValues:(NSDictionary *)primaryValues
+{
+    return [_registeredObjects objectForKey:[self.class _keyForObjectClass:objectClass primaryValues:primaryValues]];
+}
+
+
+#pragma mark - Current Connection
 
 static TNKConnection *_defaultConnection = nil;
 
@@ -115,6 +124,7 @@ static TNKConnection *_defaultConnection = nil;
     
     self = [super init];
     if (self) {
+        _registeredObjects = [[NSMapTable alloc] initWithKeyOptions:NSMapTableCopyIn valueOptions:NSMapTableWeakMemory capacity:0];
         _insertedObjects = [NSMutableSet new];
         _updatedObjects = [NSMutableSet new];
         _deletedObjects = [NSMutableSet new];
@@ -144,10 +154,39 @@ static TNKConnection *_defaultConnection = nil;
 
 #pragma mark - Objects Management
 
++ (NSString *)_keyForObject:(TNKObject *)object
+{
+    NSMutableDictionary *primaryKeys = [NSMutableDictionary new];
+    for (NSString *key in [[[object.class primaryKeys] allObjects] sortedArrayUsingSelector:@selector(compare:)]) {
+        primaryKeys[key] = [object valueForKey:key];
+    }
+    
+    return [self _keyForObjectClass:object.class primaryValues:primaryKeys];
+}
+
++ (NSString *)_keyForObjectClass:(Class)objectClass primaryValues:(NSDictionary *)primaryValues
+{
+    NSMutableString *keyForObject = [NSMutableString stringWithString:[objectClass sqliteTableName]];
+    
+    [primaryValues enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        [keyForObject appendFormat:@",%@=%@", key, obj];
+    }];
+    
+    return keyForObject;
+}
+
+- (void)registerObject:(TNKObject *)object
+{
+    dispatch_async(_propertyQueue, ^{
+        [_registeredObjects setObject:object forKey:[self.class _keyForObject:object]];
+    });
+}
+
 - (void)insertObject:(TNKObject *)object
 {
     dispatch_async(_propertyQueue, ^{
         [_insertedObjects addObject:object];
+        [_registeredObjects setObject:object forKey:[self.class _keyForObject:object]];
         [self setNeedsSave];
     });
 }

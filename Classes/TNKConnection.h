@@ -13,6 +13,7 @@
 @property (strong, readonly) NSSet *insertedObjects;
 @property (strong, readonly) NSSet *updatedObjects;
 @property (strong, readonly) NSSet *deletedObjects;
+- (id)existingObjectWithClass:(Class)class primaryValues:(NSDictionary *)primaryValues;
 
 + (void)setDefaultConnection:(TNKConnection *)connection;
 + (instancetype)defaultConnection;

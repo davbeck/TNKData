@@ -143,6 +143,29 @@
     return type;
 }
 
++ (Class)_classForPersistentKey:(NSString *)key
+{
+    NSString *type = [self _typeForPersistentKey:key];
+    
+    if ([type characterAtIndex:0] == '@') {
+        if (type.length > 3) {
+            // formatted as @"NSClass"
+            NSString *className = [type substringWithRange:NSMakeRange(2, type.length - 3)];
+            Class class = NSClassFromString(className);
+            
+            if (class != Nil) {
+                return class;
+            }
+        }
+    } else if ([type characterAtIndex:0] == '*') {
+        return [NSString class];
+    } else {
+        return [NSNumber class];
+    }
+    
+    return Nil;
+}
+
 + (NSString *)_keyForSelector:(SEL)selector
 {
     __block NSString *keyForSelector = nil;
@@ -594,6 +617,44 @@
     [db executeUpdate:query withParameterDictionary:values];
 }
 
++ (NSArray *)executeQuery:(TNKObjectQuery *)objectQuery inDatabase:(FMDatabase *)db
+{
+    NSString *whereClause = [objectQuery.predicate sqliteWhereClause];
+    NSArray *arguments = [objectQuery.predicate sqliteWhereClauseArguments];
+    NSString *query = [NSString stringWithFormat:@"SELECT %@ FROM %@ WHERE %@", [[objectQuery.keysToFetch allObjects] componentsJoinedByString:@", "], [self.class sqliteTableName], whereClause];
+    NSLog(@"select query: %@, [%@]", query, [arguments componentsJoinedByString:@", "]);
+    
+    FMResultSet *resultSet = [db executeQuery:query withArgumentsInArray:arguments];
+    NSMutableArray *objects = [NSMutableArray new];
+    while ([resultSet next]) {
+        TNKObject *object = [[self alloc] init];
+        object.connection = [TNKConnection currentConnection];
+        
+        NSDictionary *resultDictionary = resultSet.resultDictionary;
+        NSMutableDictionary *faultedValues = [[NSMutableDictionary alloc] initWithCapacity:resultDictionary.count];
+        [resultDictionary enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+            Class class = [self _classForPersistentKey:key];
+            if ([class isSubclassOfClass:[NSDate class]] && [obj respondsToSelector:@selector(doubleValue)]) {
+                faultedValues[key] = [class dateWithTimeIntervalSince1970:[obj doubleValue]];
+            } else if ([class isSubclassOfClass:[NSString class]] && ![obj isKindOfClass:class]) {
+                faultedValues[key] = [class stringWithString:[obj description]];
+            } else if ([class isSubclassOfClass:[NSNumber class]] && ![obj isKindOfClass:class] && [obj respondsToSelector:@selector(doubleValue)]) {
+                faultedValues[key] = [class numberWithDouble:[obj doubleValue]];
+            } else if ([obj isKindOfClass:class]) {
+                faultedValues[key] = obj;
+            } else {
+                NSLog(@"Warning, ignoring object because it is not able to be converted to the correct type: obj=%@, key=%@, expected class=%@", obj, key, NSStringFromClass(class));
+            }
+        }];
+        object->_faultedValues = faultedValues;
+        [object.connection registerObject:object];
+        
+        [objects addObject:object];
+    }
+    
+    return objects;
+}
+
 
 #pragma mark - Insertion
 
@@ -608,6 +669,44 @@
     }
     
     return self;
+}
+
++ (instancetype)find:(NSDictionary *)values
+{
+    return [self find:values usingQuery:nil];
+}
+
++ (instancetype)find:(NSDictionary *)values usingQuery:(void(^)(TNKObjectQuery *query))queryBlock
+{
+    TNKObject *object = [[TNKConnection currentConnection] existingObjectWithClass:self.class primaryValues:values];
+    
+    if (object == nil) {
+        TNKObjectQuery *query = [[TNKObjectQuery alloc] initWithObjectClass:self.class];
+        query.limit = 1;
+        
+        NSMutableArray *predicates = [NSMutableArray new];
+        [values enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+            [predicates addObject:[NSComparisonPredicate predicateWithLeftExpression:[NSExpression expressionForKeyPath:key]
+                                                                     rightExpression:[NSExpression expressionForConstantValue:obj]
+                                                                            modifier:NSDirectPredicateModifier
+                                                                                type:NSEqualToPredicateOperatorType
+                                                                             options:0]];
+        }];
+        query.predicate = [NSCompoundPredicate andPredicateWithSubpredicates:predicates];
+        
+        if (queryBlock != nil) {
+            queryBlock(query);
+        }
+        
+        object = [query run].firstObject;
+    }
+    
+    return object;
+}
+
++ (instancetype)findByServerID:(NSUInteger)serverID
+{
+    return [self find:@{@"objectID": @(serverID)}];
 }
 
 + (instancetype)insertObjectWithInitialization:(void(^)(id object))initialization
@@ -629,6 +728,39 @@
 - (void)deleteObject
 {
     [self.connection deleteObject:self];
+}
+
+
+#pragma mark - 
+
+- (NSString *)description
+{
+    NSMutableString *description = [[NSMutableString alloc] initWithString:@"<"];
+    [description appendString:NSStringFromClass(self.class)];
+    [description appendString:@": "];
+    [description appendFormat:@"%p", self];
+    [description appendString:@"{"];
+    
+    NSDictionary *faultedValues = self.faultedValues;
+    BOOL first = YES;
+    for (NSString *key in [self.class persistentKeys]) {
+        if (!first) {
+            [description appendString:@", "];
+        }
+        first = NO;
+        
+        [description appendString:key];
+        [description appendString:@"="];
+        if (faultedValues[key] == nil) {
+            [description appendString:@"(fault)"];
+        } else {
+            [description appendString:[faultedValues[key] description]];
+        }
+    }
+    
+    [description appendString:@"}>"];
+    
+    return description;
 }
 
 @end

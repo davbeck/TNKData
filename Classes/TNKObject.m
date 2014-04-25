@@ -157,8 +157,6 @@
                 return class;
             }
         }
-    } else if ([type characterAtIndex:0] == '*') {
-        return [NSString class];
     } else {
         return [NSNumber class];
     }
@@ -250,11 +248,6 @@
     return [[self primitiveValueForKey:[self.class _keyForSelector:_cmd]] doubleValue];
 }
 
-- (const char *)_persistentGetter_string
-{
-    return [[self primitiveValueForKey:[self.class _keyForSelector:_cmd]] UTF8String];
-}
-
 - (id)_persistentGetter_id
 {
     return [self primitiveValueForKey:[self.class _keyForSelector:_cmd]];
@@ -291,8 +284,6 @@
             return @selector(_persistentGetter_float);
         case 'd':
             return @selector(_persistentGetter_double);
-        case '*':
-            return @selector(_persistentGetter_string);
         default:
             return @selector(_persistentGetter_id);
     }
@@ -363,11 +354,6 @@
     [self setPrimativeValue:@(value) forKey:[self.class _keyForSelector:_cmd]];
 }
 
-- (void)_persistentSetter_string:(const char *)value
-{
-    [self setPrimativeValue:@(value) forKey:[self.class _keyForSelector:_cmd]];
-}
-
 - (void)_persistentSetter_id:(id)value
 {
     [self setPrimativeValue:value forKey:[self.class _keyForSelector:_cmd]];
@@ -404,8 +390,6 @@
             return @selector(_persistentSetter_float:);
         case 'd':
             return @selector(_persistentSetter_double:);
-        case '*':
-            return @selector(_persistentSetter_string:);
         default:
             return @selector(_persistentSetter_id:);
     }
@@ -523,8 +507,6 @@
             case 'f':
             case 'd':
                 return @"REAL";
-            case '*':
-                return @"TEXT";
         }
     }
     
@@ -540,6 +522,17 @@
     return nil;
 }
 
+- (NSString *)sqliteWhereClause
+{
+    NSSet *primaryKeys = [self.class primaryKeys];
+    NSMutableArray *keyClauses = [[NSMutableArray alloc] initWithCapacity:primaryKeys.count];
+    for (NSString *key in primaryKeys) {
+        [keyClauses addObject:[NSString stringWithFormat:@"%1$@ = :%1$@", key]];
+    }
+    
+    return [keyClauses componentsJoinedByString:@" AND "];
+}
+
 + (void)createTableInDatabase:(FMDatabase *)db
 {
     NSSet *persistentKeys = [self persistentKeys];
@@ -552,18 +545,8 @@
     }
     
     NSString *sql = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (%@)", [self sqliteTableName], [columnDefinitions componentsJoinedByString:@", "]];
+    NSLog(@"create table sql: %@", sql);
     [db executeUpdate:sql];
-}
-
-- (NSString *)sqliteWhereClause
-{
-    NSSet *primaryKeys = [self.class primaryKeys];
-    NSMutableArray *keyClauses = [[NSMutableArray alloc] initWithCapacity:primaryKeys.count];
-    for (NSString *key in primaryKeys) {
-        [keyClauses addObject:[NSString stringWithFormat:@"%1$@ = :%1$@", key]];
-    }
-    
-    return [keyClauses componentsJoinedByString:@" AND "];
 }
 
 - (void)insertIntoDatabase:(FMDatabase *)db

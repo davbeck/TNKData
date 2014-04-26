@@ -25,9 +25,26 @@ static void TNKSQLiteRegexp(sqlite3_context *context, int argc, sqlite3_value **
 		NSString *value = [NSString stringWithUTF8String:(const char *)sqlite3_value_text(argv[1])];
         
 		if (pattern != nil && value != nil) {
-			NSError *error = nil;
-			// assumes that it is case sensitive. If you need case insensitivity, then prefix your regex with (?i)
-			NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:kNilOptions error:&error];
+            static NSCache *cache = nil;
+            static dispatch_once_t onceToken;
+            dispatch_once(&onceToken, ^{
+                cache = [NSCache new];
+            });
+            
+            NSRegularExpression *regex = [cache objectForKey:pattern];
+            if (regex == nil) {
+                NSError *error = nil;
+                // assumes that it is case sensitive. If you need case insensitivity, then prefix your regex with (?i)
+                NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:kNilOptions error:&error];
+                
+                if (regex == nil) {
+                    sqlite3_result_error(context, [[error localizedDescription] UTF8String], -1);
+                    return;
+                }
+                
+                [cache setObject:regex forKey:pattern];
+            }
+            
 			if (regex != nil) {
 				numberOfMatches = [regex numberOfMatchesInString:value options:0 range:NSMakeRange(0, [value length])];
             }

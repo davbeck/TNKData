@@ -10,6 +10,26 @@
 
 @implementation TNKTestObject
 
+@dynamic stringProperty;
+@dynamic numberProperty;
+@dynamic dateProperty;
+
+@dynamic charProperty;
+@dynamic shortProperty;
+@dynamic intProperty;
+@dynamic longProperty;
+@dynamic longLongProperty;
+@dynamic unsigned_charProperty;
+@dynamic unsigned_shortProperty;
+@dynamic unsigned_intProperty;
+@dynamic unsigned_longProperty;
+@dynamic unsigned_longLongProperty;
+@dynamic integerProperty;
+
+@dynamic floatProperty;
+@dynamic doubleProperty;
+@dynamic timeIntervalProperty;
+
 + (NSSet *)persistentKeys
 {
     return [NSSet setWithArray:@[

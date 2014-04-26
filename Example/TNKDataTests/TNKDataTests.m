@@ -101,4 +101,48 @@
     }];
 }
 
+- (void)testRegex
+{
+    [TNKConnection useConnection:_connection block:^(TNKConnection *connection) {
+        [TNKTestObject insertObjectWithInitialization:^(TNKTestObject *object) {
+            object.stringProperty = @"Testing-ABC";
+        }];
+        [TNKTestObject insertObjectWithInitialization:^(TNKTestObject *object) {
+            object.stringProperty = @"Testing-123";
+        }];
+        [connection save];
+        
+        TNKObjectQuery *query = [[TNKObjectQuery alloc] initWithObjectClass:[TNKTestObject class]];
+        query.predicate = [NSPredicate predicateWithFormat:@"stringProperty MATCHES 'Testing-[0-9]+'"];
+        NSArray *objects = [query run];
+        
+        XCTAssertEqual(objects.count, 1, @"Regular expression should only return a single result.");
+        XCTAssertEqualObjects([objects.firstObject stringProperty], @"Testing-123", @"Regular expression should return a numerical result.");
+    }];
+}
+
+- (void)testLike
+{
+    [TNKConnection useConnection:_connection block:^(TNKConnection *connection) {
+        [TNKTestObject insertObjectWithInitialization:^(TNKTestObject *object) {
+            object.stringProperty = @"testing";
+        }];
+        [TNKTestObject insertObjectWithInitialization:^(TNKTestObject *object) {
+            object.stringProperty = @"Testing-123";
+        }];
+        [TNKTestObject insertObjectWithInitialization:^(TNKTestObject *object) {
+            object.stringProperty = @"Test";
+        }];
+        [connection save];
+        
+        TNKObjectQuery *query = [[TNKObjectQuery alloc] initWithObjectClass:[TNKTestObject class]];
+        query.predicate = [NSPredicate predicateWithFormat:@"stringProperty LIKE 'TESTING%'"];
+        NSArray *objects = [query run];
+        
+        XCTAssertEqual(objects.count, 2, @"Like expression should return 2 results.");
+        
+        // note, we are not testing, or supporting case- and diacritic-insensitive like
+    }];
+}
+
 @end

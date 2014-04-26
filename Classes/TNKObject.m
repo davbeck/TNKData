@@ -14,6 +14,9 @@
 #import "TNKConnection_Private.h"
 
 
+#define TNKInObjectQueueThreadKey @"TNKInObjectQueue"
+
+
 @interface TNKObject ()
 {
     NSMutableDictionary *_faultedValues;
@@ -38,9 +41,9 @@
 - (NSDictionary *)faultedValues
 {
     __block NSDictionary *faultedValues = nil;
-    dispatch_sync(_propertyQueue, ^{
+    [self performBlockAndWait:^{
         faultedValues = [_faultedValues copy];
-    });
+    }];
     
     return faultedValues;
 }
@@ -48,9 +51,9 @@
 - (NSDictionary *)changedValues
 {
     __block NSDictionary *changedValues = nil;
-    dispatch_sync(_propertyQueue, ^{
+    [self performBlockAndWait:^{
         changedValues = [_changedValues copy];
-    });
+    }];
     
     return changedValues;
 }
@@ -107,7 +110,8 @@
         setter = sel_getUid(setterString);
         free(setterString);
     } else {
-        setter = NSSelectorFromString([NSString stringWithFormat:@"set%@:", [key capitalizedString]]);
+        NSString *capitalizedKey = [key stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:[[key substringToIndex:1] capitalizedString]];
+        setter = NSSelectorFromString([NSString stringWithFormat:@"set%@:", capitalizedKey]);
     }
     
     return setter;
@@ -427,9 +431,9 @@
 - (id)primitiveValueForKey:(NSString *)key
 {
     __block id value = nil;
-    dispatch_sync(_propertyQueue, ^{
+    [self performBlockAndWait:^{
         value = _faultedValues[key];
-    });
+    }];
     
     return value;
 }
@@ -437,13 +441,13 @@
 - (void)setPrimativeValue:(id)value forKey:(NSString *)key
 {
     value = [value copy];
-    dispatch_async(_propertyQueue, ^{
+    [self performBlock:^{
         _faultedValues[key] = value;
         _changedValues[key] = value;
         if (!self.isInserted && !self.isUpdated && !self.isDeleted) {
             [self.connection updateObject:self];
         }
-    });
+    }];
 }
 
 - (id)valueForUndefinedKey:(NSString *)key
@@ -563,9 +567,9 @@
     
     [db executeUpdate:query withParameterDictionary:values];
     
-    dispatch_sync(_propertyQueue, ^{
+    [self performBlockAndWait:^{
         _faultedValues[@"objectID"] = @([db lastInsertRowId]);
-    });
+    }];
 }
 
 - (void)updateInDatabase:(FMDatabase *)db
@@ -711,6 +715,35 @@
 - (void)deleteObject
 {
     [self.connection deleteObject:self];
+}
+
+
+#pragma mark - Concurrency
+
+- (void)performBlock:(void(^)())block
+{
+    if ([[NSThread currentThread].threadDictionary[TNKInObjectQueueThreadKey] boolValue]) {
+        block();
+    } else {
+        dispatch_async(_propertyQueue, ^{
+            [NSThread currentThread].threadDictionary[TNKInObjectQueueThreadKey] = @YES;
+            block();
+            [[NSThread currentThread].threadDictionary removeObjectForKey:TNKInObjectQueueThreadKey];
+        });
+    }
+}
+
+- (void)performBlockAndWait:(void(^)())block
+{
+    if ([[NSThread currentThread].threadDictionary[TNKInObjectQueueThreadKey] boolValue]) {
+        block();
+    } else {
+        dispatch_sync(_propertyQueue, ^{
+            [NSThread currentThread].threadDictionary[TNKInObjectQueueThreadKey] = @YES;
+            block();
+            [[NSThread currentThread].threadDictionary removeObjectForKey:TNKInObjectQueueThreadKey];
+        });
+    }
 }
 
 

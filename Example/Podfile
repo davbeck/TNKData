@@ -1,3 +1,7 @@
 target "TNKDataDemo" do
     pod "TNKData", :path => "../"
 end
+
+target "TNKDataTests" do
+    pod "TNKData", :path => "../"
+end

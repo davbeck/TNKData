@@ -73,6 +73,12 @@
                 } case NSNotEqualToPredicateOperatorType: {
                     operator = @"!=";
                     break;
+                } case NSMatchesPredicateOperatorType: {
+                    operator = @"REGEXP";
+                    break;
+                } case NSLikePredicateOperatorType: {
+                    operator = @"LIKE";
+                    break;
                 } default: {
                     break;
                 }

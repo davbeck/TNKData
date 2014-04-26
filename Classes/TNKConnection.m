@@ -13,6 +13,29 @@
 
 
 #define TNKCurrentConnectionThreadKey @"TNKCurrentConnection"
+#define TNKInPropertyQueueThreadKey @"TNKInPropertyQueue"
+
+
+// http://www.blackdogfoundry.com/blog/supporting-regular-expressions-in-sqlite/
+static void TNKSQLiteRegexp(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+	NSUInteger numberOfMatches = 0;
+	if (argc == 2) {
+		NSString *pattern = [NSString stringWithUTF8String:(const char *)sqlite3_value_text(argv[0])];
+		NSString *value = [NSString stringWithUTF8String:(const char *)sqlite3_value_text(argv[1])];
+        
+		if (pattern != nil && value != nil) {
+			NSError *error = nil;
+			// assumes that it is case sensitive. If you need case insensitivity, then prefix your regex with (?i)
+			NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:kNilOptions error:&error];
+			if (regex != nil) {
+				numberOfMatches = [regex numberOfMatchesInString:value options:0 range:NSMakeRange(0, [value length])];
+            }
+		}
+	}
+    
+	sqlite3_result_int(context, (int)numberOfMatches);
+}
 
 
 @interface TNKConnection ()
@@ -40,9 +63,9 @@
 - (NSSet *)insertedObjects
 {
     __block NSSet *insertedObjects = nil;
-    dispatch_sync(_propertyQueue, ^{
+    [self performBlockAndWait:^{
         insertedObjects = [_insertedObjects copy];
-    });
+    }];
     
     return insertedObjects;
 }
@@ -50,9 +73,9 @@
 - (NSSet *)updatedObjects
 {
     __block NSSet *updatedObjects = nil;
-    dispatch_sync(_propertyQueue, ^{
+    [self performBlockAndWait:^{
         updatedObjects = [_updatedObjects copy];
-    });
+    }];
     
     return updatedObjects;
 }
@@ -60,9 +83,9 @@
 - (NSSet *)deletedObjects
 {
     __block NSSet *deletedObjects = nil;
-    dispatch_sync(_propertyQueue, ^{
+    [self performBlockAndWait:^{
         deletedObjects = [_deletedObjects copy];
-    });
+    }];
     
     return deletedObjects;
 }
@@ -102,7 +125,9 @@ static TNKConnection *_defaultConnection = nil;
         block(connection);
     }
     
-    [NSThread currentThread].threadDictionary[TNKCurrentConnectionThreadKey] = oldConnection;
+    if (oldConnection != nil) {
+        [NSThread currentThread].threadDictionary[TNKCurrentConnectionThreadKey] = oldConnection;
+    }
 }
 
 
@@ -136,6 +161,8 @@ static TNKConnection *_defaultConnection = nil;
         _classes = [classes copyWithZone:nil];
         
         [_databaseQueue inTransaction:^(FMDatabase *db, BOOL *rollback) {
+            sqlite3_create_function_v2(db.sqliteHandle, "REGEXP", 2, SQLITE_ANY, 0, TNKSQLiteRegexp, NULL, NULL, NULL);
+            
             for (Class class in _classes) {
                 [class createTableInDatabase:db];
             }
@@ -177,34 +204,64 @@ static TNKConnection *_defaultConnection = nil;
 
 - (void)registerObject:(TNKObject *)object
 {
-    dispatch_async(_propertyQueue, ^{
+    [self performBlock:^{
         [_registeredObjects setObject:object forKey:[self.class _keyForObject:object]];
-    });
+    }];
 }
 
 - (void)insertObject:(TNKObject *)object
 {
-    dispatch_async(_propertyQueue, ^{
+    NSString *key = [self.class _keyForObject:object];
+    [self performBlock:^{
         [_insertedObjects addObject:object];
-        [_registeredObjects setObject:object forKey:[self.class _keyForObject:object]];
+        [_registeredObjects setObject:object forKey:key];
         [self setNeedsSave];
-    });
+    }];
 }
 
 - (void)updateObject:(TNKObject *)object
 {
-    dispatch_async(_propertyQueue, ^{
+    [self performBlock:^{
         [_updatedObjects addObject:object];
         [self setNeedsSave];
-    });
+    }];
 }
 
 - (void)deleteObject:(TNKObject *)object
 {
-    dispatch_async(_propertyQueue, ^{
+    [self performBlock:^{
         [_deletedObjects addObject:object];
         [self setNeedsSave];
-    });
+    }];
+}
+
+
+#pragma mark - Concurrency
+
+- (void)performBlock:(void(^)())block
+{
+    if ([[NSThread currentThread].threadDictionary[TNKInPropertyQueueThreadKey] boolValue]) {
+        block();
+    } else {
+        dispatch_async(_propertyQueue, ^{
+            [NSThread currentThread].threadDictionary[TNKInPropertyQueueThreadKey] = @YES;
+            block();
+            [[NSThread currentThread].threadDictionary removeObjectForKey:TNKInPropertyQueueThreadKey];
+        });
+    }
+}
+
+- (void)performBlockAndWait:(void(^)())block
+{
+    if ([[NSThread currentThread].threadDictionary[TNKInPropertyQueueThreadKey] boolValue]) {
+        block();
+    } else {
+        dispatch_sync(_propertyQueue, ^{
+            [NSThread currentThread].threadDictionary[TNKInPropertyQueueThreadKey] = @YES;
+            block();
+            [[NSThread currentThread].threadDictionary removeObjectForKey:TNKInPropertyQueueThreadKey];
+        });
+    }
 }
 
 
@@ -212,7 +269,7 @@ static TNKConnection *_defaultConnection = nil;
 
 - (void)setNeedsSave
 {
-    dispatch_async(_propertyQueue, ^{
+    [self performBlock:^{
         if (!_needsSave) {
             _needsSave = YES;
             
@@ -220,12 +277,12 @@ static TNKConnection *_defaultConnection = nil;
                 [self triggerSave];
             });
         }
-    });
+    }];
 }
 
 - (void)triggerSave
 {
-    dispatch_async(_propertyQueue, ^{
+    [self performBlock:^{
         if (_needsSave) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 [self save];
@@ -239,7 +296,7 @@ static TNKConnection *_defaultConnection = nil;
                 [[UIApplication sharedApplication] endBackgroundTask:_saveTask];
             }
         }
-    });
+    }];
 }
 
 - (void)save
@@ -249,7 +306,7 @@ static TNKConnection *_defaultConnection = nil;
     __block NSSet *insertedObjects = nil;
     __block NSSet *updatedObjects = nil;
     __block NSSet *deletedObjects = nil;
-    dispatch_async(_propertyQueue, ^{
+    [self performBlockAndWait:^{
         _needsSave = NO;
         
         insertedObjects = [_insertedObjects copy];
@@ -260,7 +317,7 @@ static TNKConnection *_defaultConnection = nil;
         
         deletedObjects = [_deletedObjects copy];
         _deletedObjects = [NSMutableSet new];
-    });
+    }];
     
     [_databaseQueue inTransaction:^(FMDatabase *db, BOOL *rollback) {
         for (TNKObject *object in insertedObjects) {

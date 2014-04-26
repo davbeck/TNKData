@@ -37,6 +37,27 @@ static void TNKSQLiteRegexp(sqlite3_context *context, int argc, sqlite3_value **
 	sqlite3_result_int(context, (int)numberOfMatches);
 }
 
+static void TNKSQLiteLike(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+	BOOL matches = NO;
+	if (argc == 3) {
+		NSString *value = [NSString stringWithUTF8String:(const char *)sqlite3_value_text(argv[0])];
+		NSString *pattern = [NSString stringWithUTF8String:(const char *)sqlite3_value_text(argv[1])];
+        NSComparisonPredicateOptions options = sqlite3_value_int(argv[2]);
+        
+		if (pattern != nil && value != nil) {
+            NSPredicate *predicate = [NSComparisonPredicate predicateWithLeftExpression:[NSExpression expressionForEvaluatedObject]
+                                                                        rightExpression:[NSExpression expressionForConstantValue:pattern]
+                                                                               modifier:NSDirectPredicateModifier
+                                                                                   type:NSLikePredicateOperatorType
+                                                                                options:options];
+            matches = [predicate evaluateWithObject:value];
+		}
+	}
+    
+	sqlite3_result_int(context, (int)matches);
+}
+
 
 @interface TNKConnection ()
 {
@@ -162,6 +183,7 @@ static TNKConnection *_defaultConnection = nil;
         
         [_databaseQueue inTransaction:^(FMDatabase *db, BOOL *rollback) {
             sqlite3_create_function_v2(db.sqliteHandle, "REGEXP", 2, SQLITE_ANY, 0, TNKSQLiteRegexp, NULL, NULL, NULL);
+            sqlite3_create_function_v2(db.sqliteHandle, "PREDICATE_LIKE", 3, SQLITE_ANY, 0, TNKSQLiteLike, NULL, NULL, NULL);
             
             for (Class class in _classes) {
                 [class createTableInDatabase:db];

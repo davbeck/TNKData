@@ -77,6 +77,7 @@
                     operator = @"REGEXP";
                     break;
                 } case NSLikePredicateOperatorType: {
+                    return [NSString stringWithFormat:@"PREDICATE_LIKE(%@, %@, %lu)", [self.leftExpression sqliteWhereClause], [self.rightExpression sqliteWhereClause], self.options];
                     operator = @"LIKE";
                     break;
                 } default: {

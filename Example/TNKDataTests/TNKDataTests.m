@@ -125,7 +125,7 @@
 {
     [TNKConnection useConnection:_connection block:^(TNKConnection *connection) {
         [TNKTestObject insertObjectWithInitialization:^(TNKTestObject *object) {
-            object.stringProperty = @"testing";
+            object.stringProperty = @"testïng";
         }];
         [TNKTestObject insertObjectWithInitialization:^(TNKTestObject *object) {
             object.stringProperty = @"Testing-123";
@@ -136,7 +136,7 @@
         [connection save];
         
         TNKObjectQuery *query = [[TNKObjectQuery alloc] initWithObjectClass:[TNKTestObject class]];
-        query.predicate = [NSPredicate predicateWithFormat:@"stringProperty LIKE 'TESTING%'"];
+        query.predicate = [NSPredicate predicateWithFormat:@"stringProperty LIKE[cd] 'TESTING*'"];
         NSArray *objects = [query run];
         
         XCTAssertEqual(objects.count, 2, @"Like expression should return 2 results.");
